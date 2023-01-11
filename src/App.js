@@ -1,23 +1,20 @@
-import logo from './logo.svg';
-import './App.css';
+import React from 'react';
+import firebase from './Utils/Firebase';
+import 'firebase/compat/auth'
 
 function App() {
+  React.useEffect(() => {
+    firebase.auth().onAuthStateChanged((user) => {
+        if (user) {
+          console.log(user)
+        } else {
+          console.log("no hay usuario")
+        }
+    });
+}, []);
   return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
+    <div>
+      App de Luis Rojas
     </div>
   );
 }
