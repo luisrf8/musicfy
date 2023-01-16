@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
 import {Button, Icon, Form, Input} from 'semantic-ui-react'
+import { toast } from 'react-toastify'
+import { validateEmail } from '../../../Utils/Validations'
 import firebase from '../../../Utils/Firebase';
 import 'firebase/auth';
 
@@ -9,6 +11,8 @@ export default function RegisterForm(props) {
   const { setSelectedForm } = props;
   const [formData, setFormData] = useState(defaulValueForm()); 
   const [showPassword, setShowPassword] = useState(false)
+  const [formError, setFormError] = useState({})
+  const [isLoading, setIsLoading] = useState(false)
 
   const handlerShowPassword = () => {
     setShowPassword(!showPassword)
@@ -22,8 +26,55 @@ export default function RegisterForm(props) {
   }
   
   const onSubmit = () => {
-    console.log("Formulario enviado.");
-    console.log(formData);
+    setFormError({});
+    let errors = {};
+    let formOk = true;
+
+    if (!validateEmail(formData.email)) {
+      errors.email = true; 
+      formOk = false; 
+    }
+    if(formData.password.length < 6) {
+      errors.password = true;
+      formOk = false; 
+    }
+    if(!formData.username) {
+      errors.username = true;
+      formOk = false; 
+    }
+    setFormError(errors);
+
+    if (formOk) {
+      setIsLoading(true);
+      firebase.auth().createUserWithEmailAndPassword(formData.email, formData.password).then(() => {
+        changeUserName();
+        sendVerificationEmail();
+      })
+      .catch(() => {
+        toast.error("Ocurrio un error al crear la cuenta")
+      })
+      .finally(() => {
+        setIsLoading(false);
+        setSelectedForm(null); 
+      })
+    }
+  }
+
+  const changeUserName = () => {
+    firebase.auth().currentUser.updateProfile({
+      displayName: formData.username
+    }).catch(() => {
+      toast.error("Error al asignar nombre del usuario");
+    })
+  }
+
+  const sendVerificationEmail = () => {
+    firebase.auth().currentUser.sendEmailVerification().then(() => {
+      toast.success("Se ha enviado un email de verificaion");
+    }).catch((err) => {
+      toast.error("Error al enviar correo de verificacion");
+      console.log(err)
+    })
   }
   return (
     <div className='register-form'>
@@ -35,8 +86,13 @@ export default function RegisterForm(props) {
             name='email'
             placeholder='Correo Electronico'
             icon='mail outline'
-            //error={}
+            error={formError.email}
           />
+          {formError.email && (
+            <span className='error-text'>
+              Introduzca un correo Valido
+            </span>
+          )}
         </Form.Field>
         <Form.Field>
           <Input
@@ -44,8 +100,13 @@ export default function RegisterForm(props) {
             name='password'
             placeholder='Contraseña'
             icon={showPassword ? (<Icon name='eye slash outline' link onClick={handlerShowPassword}/>) : (<Icon name='eye' link onClick={handlerShowPassword}/>)}
-            //error={}
+            error={formError.password}
           />
+          {formError.password && (
+            <span className='error-text'>
+              Introduzca un contraseña de mas de 6 digitos.
+            </span>
+          )}
         </Form.Field>
         <Form.Field>
           <Input
@@ -53,10 +114,15 @@ export default function RegisterForm(props) {
             name='username'
             placeholder='Nombre'
             icon='user circle outline'
-            //error={}
+            error={formError.username}
           />
+          {formError.username && (
+            <span className='error-text'>
+              Introduzca un nombre.
+            </span>
+          )}
         </Form.Field>
-        <Button type='submit'>
+        <Button type='submit' loading = {isLoading}>
           Continuar
         </Button>
       </Form>
