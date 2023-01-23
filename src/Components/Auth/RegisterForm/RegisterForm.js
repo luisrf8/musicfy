@@ -71,9 +71,8 @@ export default function RegisterForm(props) {
   const sendVerificationEmail = () => {
     firebase.auth().currentUser.sendEmailVerification().then(() => {
       toast.success("Se ha enviado un email de verificaion");
-    }).catch((err) => {
+    }).catch(() => {
       toast.error("Error al enviar correo de verificacion");
-      console.log(err)
     })
   }
   return (
