@@ -1,5 +1,5 @@
 import React, { useState } from 'react'
-import {Button, Icon, Form, Input} from 'semantic-ui-react'
+import { Button, Icon, Form, Input } from 'semantic-ui-react'
 import { toast } from 'react-toastify'
 import { validateEmail } from '../../../Utils/Validations'
 import firebase from '../../../Utils/Firebase';
@@ -21,14 +21,17 @@ export default function RegisterForm(props) {
     // console.log("Name: " + e.target.name);
     // console.log("Value: " + e.target.value);
     setFormData({
-      ...formData, [e.target.name]: e.target.value
+      ...formData, [e.target.name]: e.target.value,
     })
   }
   
   const onSubmit = () => {
+    console.log("dsadsa", formData)
     setFormError({});
     let errors = {};
     let formOk = true;
+    
+    // console.log(validateEmail(formData.email))
 
     if (!validateEmail(formData.email)) {
       errors.email = true; 
@@ -48,10 +51,10 @@ export default function RegisterForm(props) {
       setIsLoading(true);
       firebase.auth().createUserWithEmailAndPassword(formData.email, formData.password).then(() => {
         changeUserName();
-        sendVerificationEmail();
+        sendVerificationEmail(); 
       })
-      .catch(() => {
-        toast.error("Ocurrio un error al crear la cuenta")
+      .catch((error) => {
+        toast.error(error, "Ocurrio un error al crear la cuenta")
       })
       .finally(() => {
         setIsLoading(false);
