@@ -1,7 +1,7 @@
 import React, { useState } from "react";
 import { Button, Icon, Form, Input } from "semantic-ui-react";
 import { toast } from "react-toastify";
-import { validateEmail } from "../../../Utils/Validations";
+// import { validateEmail } from "../../../Utils/Validations";
 import firebase from "../../../Utils/Firebase";
 import "firebase/auth";
 
@@ -34,8 +34,13 @@ export default function LoginForm(props) {
     setFormError({})
     let errors = {}
     let formOk = true
-
-    if(!validateEmail(formData.email)) {
+    // esto es para tener la validacion por email
+    // if(!validateEmail(formData.email)) {
+    //   errors.email = true; 
+    //   formOk = false; 
+    // }
+    // end esto es para tener la validacion por email
+    if(!formData.email) {
       errors.email = true; 
       formOk = false; 
     }
@@ -44,14 +49,21 @@ export default function LoginForm(props) {
       formOk = false; 
     }
     setFormError(errors);
+
     if (formOk) {
       setIsLoading(true);
       firebase.auth( ).signInWithEmailAndPassword(formData.email, formData.password)
       .then(response => {
-        console.log(response)
+        console.log(response.user)
+        setUserActive(true)
       })
       .catch(err => {
+        console.log(err.code)
         handlerErrors(err.code);
+      })
+      .finally(() => {
+        setIsLoading(false);
+        // setSelectedForm(null);
       })
     }
   };
@@ -97,7 +109,7 @@ export default function LoginForm(props) {
             </span>
           )}
         </Form.Field>
-        <Button type="submit">Continuar</Button>
+        <Button type="submit" loading = {isLoading}>Continuar</Button>
       </Form>
 
       {!userActive && (
@@ -162,6 +174,9 @@ function handlerErrors(code) {
     break;
     case "auth/too-manu-request":
       toast.warning("has intentado demasiadas veces")
+    break;
+    case "auth/user-not-found":
+      toast.warning("usuario o contraseña incorrectos.")
     break;
     default:
     break;

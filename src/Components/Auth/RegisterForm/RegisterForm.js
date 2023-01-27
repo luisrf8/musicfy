@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import { Button, Icon, Form, Input } from 'semantic-ui-react'
 import { toast } from 'react-toastify'
-import { validateEmail } from '../../../Utils/Validations'
+// import { validateEmail } from '../../../Utils/Validations'
 import firebase from '../../../Utils/Firebase';
 import 'firebase/auth';
 
@@ -33,7 +33,13 @@ export default function RegisterForm(props) {
     
     // console.log(validateEmail(formData.email))
 
-    if (!validateEmail(formData.email)) {
+    // esto es para tener la validacion por email
+    // if(!validateEmail(formData.email)) {
+    //   errors.email = true; 
+    //   formOk = false; 
+    // }
+    // end esto es para tener la validacion por email
+    if(!formData.email) {
       errors.email = true; 
       formOk = false; 
     }

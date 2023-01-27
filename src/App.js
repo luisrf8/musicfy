@@ -1,30 +1,36 @@
 import React, { useState } from 'react';
 import { ToastContainer } from "react-toastify";
+import { getAuth, onAuthStateChanged } from "firebase/auth";
 import firebase from './Utils/Firebase';
 import 'firebase/compat/auth'
 import Auth from './pages/Auth/Auth';
+import LoggedLayout from './Components/Auth/Layouts/LoggedLayout';
 
 function App() {
   const [user, setUser] = useState(null);
   const [isLoading, setIsLoading] = useState(true);
+  const auth = getAuth()
 
-    firebase.auth().onAuthStateChanged(currentUser => {
-      console.log(currentUser)
-      if(!currentUser?.emailVerified) {
-        firebase.auth().signOut()
-        setUser(null);
-      }
-      else {
-        setUser(currentUser);
-      }
-      setIsLoading(false);
-    });
-    if (isLoading) {
-      return null;
-    }
+    onAuthStateChanged(auth, (user) => {
+      setUser(user);
+    })
+    // firebase.auth().onAuthStateChanged(currentUser => {
+    //   console.log(currentUser)
+    //   if(!currentUser?.emailVerified) {
+    //     firebase.auth().signOut()
+    //     setUser(null);
+    //   }
+    //   else {
+    //     setUser(currentUser);
+    //   }
+    //   setIsLoading(false);
+    // });
+    // if (isLoading) {
+    //   return null;
+    // }
   return (
     <>
-      {!user ? <Auth/> : <UserLogged/>}
+      {!user ? <Auth/> : <LoggedLayout user={user}/>}
       <ToastContainer 
         position='top-center'
         autoClose = {5000}
@@ -41,16 +47,6 @@ function App() {
   );
 }
 
-function UserLogged() {
-  const logOut = () => {
-    firebase.auth().signOut();
-  }
-  return (
-    <div style={{display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", height: "100vh"}}>
-      <h1>Usuario Logueado</h1>
-      <button onClick={logOut}>Cerrar Sesion</button>
-    </div>
-  )
-}
+
 
 export default App;
