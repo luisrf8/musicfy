@@ -1,6 +1,6 @@
 import React from 'react'
 import { Grid } from "semantic-ui-react"
-// import Routes from '../../../../routes/Routes';
+import Routes from '../../../../routes/Routes';
 import { BrowserRouter as Router } from "react-router-dom"
 import "./LoggedLayout.scss"
 
@@ -18,7 +18,7 @@ export default function LoggedLayout(props) {
           </Grid.Column>
           <Grid.Column width={13}>
             <h2>TopBar</h2>
-            {/* <Routes /> */}
+            <Routes />
           </Grid.Column>
         </Grid.Row>
         <Grid.Row>
